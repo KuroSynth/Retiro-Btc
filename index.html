@@ -1,0 +1,1367 @@
+<!DOCTYPE html>
+
+<html lang="es">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0, viewport-fit=cover" name="viewport"/>
+<meta content="yes" name="apple-mobile-web-app-capable"/>
+<title>Calculadora de ahorro en Bitcoin</title>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;0,9..144,800;1,9..144,400&amp;family=DM+Sans:wght@300;400;500&amp;family=DM+Mono:wght@400;500&amp;display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{
+  --bg:#faf8f4;--bg2:#f2ede4;--bg3:#e8e0d0;
+  --ink:#1a1208;--ink2:#5a4e38;--ink3:#9a8a6a;
+  --gold:#c8920a;--gold-bg:#fef3d0;--gold-bdr:#f0d070;
+  --btc:#e8650a;--btc-bg:#fff0e8;--btc-bdr:#f0c098;
+  --fiat:#c02020;--fiat-bg:#fff0f0;--fiat-bdr:#f0b0b0;
+  --good:#1a7a40;--good-bg:#e8f5ee;
+  --blue:#1a50a0;--blue-bg:#e8f0fc;--blue-bdr:#b0c8f0;
+  --teal:#0f7a5a;--teal-bg:#e0f5ed;--teal-bdr:#90d5b8;
+  --font-h:'Fraunces',serif;--font-b:'DM Sans',sans-serif;--font-m:'DM Mono','Courier New',monospace;
+  --r:16px;--rs:10px;--shadow:0 2px 12px rgba(26,18,8,.08);
+}
+html,body{background:var(--bg);color:var(--ink);font-family:var(--font-b);min-height:100vh;-webkit-font-smoothing:antialiased;-webkit-text-size-adjust:100%;font-size:16px;line-height:1.5}
+body{padding:0;padding-bottom:max(3rem,env(safe-area-inset-bottom))}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.5}}
+@keyframes slideDown{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-5px)}40%,80%{transform:translateX(5px)}}
+@keyframes countUp{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes shimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+
+.anim{opacity:0;animation:fadeUp .6s cubic-bezier(.22,.68,0,1.1) forwards}
+.a1{animation-delay:.05s}.a2{animation-delay:.15s}.a3{animation-delay:.25s}.a4{animation-delay:.35s}.a5{animation-delay:.45s}
+
+.page{max-width:720px;margin:0 auto;padding:0 1.25rem 4rem}
+
+/* ── HERO ── */
+.hero{text-align:center;padding:3rem 1rem 2rem;border-bottom:2px dashed var(--bg3);margin-bottom:2rem}
+.hero-emoji{font-size:52px;display:block;margin-bottom:1rem;animation:pulse 3s ease-in-out infinite}
+.hero h1{font-family:var(--font-h);font-size:clamp(26px,5vw,44px);font-weight:800;line-height:1.15;margin-bottom:1rem}
+.hero h1 span.hl-btc{color:var(--btc);border-bottom:3px solid var(--btc)}
+.hero h1 span.hl-gold{color:var(--gold);border-bottom:3px solid var(--gold)}
+.hero-lead{font-size:clamp(15px,2.5vw,17px);font-weight:300;color:var(--ink2);line-height:1.7;max-width:580px;margin:0 auto}
+
+/* ── ANALOGY BOX ── */
+.analogy{background:var(--gold-bg);border:2px solid var(--gold-bdr);border-radius:var(--r);padding:1.5rem;margin-bottom:1.5rem;position:relative;overflow:hidden}
+.analogy::before{content:'';position:absolute;top:0;left:0;right:0;height:4px;background:linear-gradient(90deg,var(--gold),#e8b030)}
+.analogy-title{font-family:var(--font-h);font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--gold);margin-bottom:8px}
+.analogy-text{font-size:15px;line-height:1.7;color:var(--ink)}
+.analogy-text strong{color:var(--ink);font-weight:500}
+
+/* ── SECTION HEADER ── */
+.section-label{font-size:11px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:var(--ink3);margin-bottom:8px;font-family:var(--font-m)}
+
+/* ── TUTORIAL OVERLAY ── */
+#tutOverlay{position:fixed;inset:0;z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px;background:rgba(26,18,8,.72);animation:fadeIn .3s ease}
+#tutBox{background:var(--bg);border:2px solid var(--bg3);border-radius:24px;width:100%;max-width:420px;overflow:hidden;box-shadow:0 24px 64px rgba(26,18,8,.2)}
+.tut-header{background:linear-gradient(135deg,rgba(200,146,10,.1),rgba(232,101,10,.07));padding:24px 24px 16px;text-align:center;border-bottom:2px dashed var(--bg3)}
+.tut-logo{font-size:36px;margin-bottom:8px}
+.tut-title{font-family:var(--font-h);font-size:20px;font-weight:700;margin-bottom:6px}
+.tut-sub{font-size:13px;color:var(--ink2);line-height:1.5}
+.tut-steps{padding:0 20px}
+.tut-step{display:flex;gap:14px;padding:14px 0;border-bottom:1.5px dashed var(--bg3)}
+.tut-step:last-child{border-bottom:none}
+.tut-step-icon{width:36px;height:36px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0;margin-top:2px}
+.tut-step-icon.amber{background:var(--gold-bg)}
+.tut-step-icon.teal{background:var(--teal-bg)}
+.tut-step-icon.blue{background:var(--blue-bg)}
+.tut-step-icon.coral{background:var(--btc-bg)}
+.tut-step-text .ttl{font-size:14px;font-weight:500;margin-bottom:2px}
+.tut-step-text .sub{font-size:12px;color:var(--ink2);line-height:1.5}
+.tut-footer{padding:16px 20px 20px;display:flex;flex-direction:column;gap:10px}
+.tut-cta{width:100%;padding:14px;background:var(--ink);border:none;border-radius:14px;color:var(--bg);font-size:15px;font-family:var(--font-b);font-weight:500;cursor:pointer;transition:all .2s}
+.tut-cta:active{opacity:.85}
+.tut-skip{background:transparent;border:none;color:var(--ink3);font-size:13px;font-family:var(--font-b);cursor:pointer;padding:6px;text-align:center}
+
+/* ── SOLVE GRID ── */
+.solve-section{background:white;border:2px solid var(--bg3);border-radius:var(--r);padding:1.5rem;margin-bottom:1.25rem;box-shadow:var(--shadow)}
+.solve-question{font-size:14px;color:var(--ink2);margin-bottom:12px;display:flex;align-items:center;gap:8px}
+.solve-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-bottom:0}
+.solve-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:6px;padding:16px 10px;background:var(--bg2);border:2px solid var(--bg3);border-radius:12px;color:var(--ink2);font-size:12px;font-family:var(--font-b);cursor:pointer;transition:all .2s;text-align:center;line-height:1.3;min-height:80px}
+.solve-btn .sicon{font-size:22px}
+.solve-btn:active{transform:scale(.96)}
+.solve-btn.active{background:var(--ink);border-color:var(--ink);color:var(--bg);font-weight:500}
+
+/* ── PARAMS CARD ── */
+.params-card{background:white;border:2px solid var(--bg3);border-radius:var(--r);padding:1.5rem;margin-bottom:1.25rem;box-shadow:var(--shadow)}
+.param-row{display:flex;align-items:center;gap:16px;padding:12px 0;border-bottom:1.5px dashed var(--bg3)}
+.param-row:last-child{border-bottom:none}
+.param-label{flex:1}
+.param-label strong{font-size:14px;font-weight:500;color:var(--ink);display:block}
+.param-label .sub{font-size:12px;color:var(--ink3)}
+.param-control{flex-shrink:0}
+.field-hidden{display:none!important}
+.input-pill{display:flex;align-items:center;background:var(--bg2);border:2px solid var(--bg3);border-radius:10px;overflow:hidden;transition:border-color .2s;height:44px}
+.input-pill:focus-within{border-color:var(--gold)}
+.input-pill .prefix,.input-pill .suffix{padding:0 10px;font-size:12px;color:var(--ink3);font-family:var(--font-m);white-space:nowrap;flex-shrink:0}
+.input-pill input,.input-pill select{background:transparent;border:none;outline:none;color:var(--ink);font-size:15px;font-family:var(--font-m);-webkit-appearance:none;min-width:0;height:100%;padding:0 4px}
+.input-pill input[type=number],.input-pill input.money-input{width:80px;text-align:right}
+.input-pill input.wide{width:110px}
+.input-pill select{padding:0 28px 0 8px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%239a8a6a'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 8px center;width:90px}
+.input-pill.err{border-color:var(--fiat)!important}
+.err-msg{font-size:11px;color:var(--fiat);font-family:var(--font-m);margin-top:4px;display:none}
+.err-msg.show{display:block;animation:slideDown .2s ease}
+
+/* ── STEP INDICATOR ── */
+.step-hint{display:flex;align-items:flex-start;gap:10px;font-size:13px;color:var(--ink2);margin-bottom:14px;line-height:1.5}
+.step-hint .sn{width:22px;height:22px;border-radius:50%;background:var(--gold);color:white;font-size:11px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+
+/* ── CTA BUTTON ── */
+.cta-wrap{margin-top:16px}
+.calc-btn{width:100%;padding:16px;background:var(--ink);border:none;border-radius:14px;color:var(--bg);font-size:15px;font-family:var(--font-b);font-weight:500;cursor:pointer;transition:all .2s;display:flex;align-items:center;justify-content:center;gap:8px}
+.calc-btn:active{transform:scale(.98);opacity:.88}
+
+/* ── PRICE BAR ── */
+.price-bar{background:white;border:2px solid var(--bg3);border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:10px;margin-bottom:1.25rem;overflow:hidden;position:relative}
+.price-bar::before{content:'';position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(200,146,10,.06),transparent);background-size:200% 100%;animation:shimmer 3s ease infinite}
+.price-dot{width:7px;height:7px;border-radius:50%;background:var(--teal);animation:pulse 2.5s ease infinite;flex-shrink:0}
+.price-label{font-size:12px;color:var(--ink3);font-family:var(--font-m);flex-shrink:0}
+.price-usd{font-size:15px;font-weight:500;color:var(--btc);font-family:var(--font-m);flex-shrink:0}
+.price-mxn{font-size:12px;color:var(--ink3);font-family:var(--font-m);margin-left:auto;flex-shrink:0}
+
+/* ── RESULTS ── */
+#results{display:none}
+.results-enter{animation:fadeUp .5s cubic-bezier(.22,.68,0,1.2) both}
+
+/* ── CHART ── */
+#chart-wrap{background:white;border:2px solid var(--bg3);border-radius:var(--r);padding:1.25rem;margin-bottom:1.25rem;box-shadow:var(--shadow)}
+.chart-topbar{display:flex;justify-content:space-between;align-items:center;margin-bottom:8px}
+.chart-title{font-size:12px;color:var(--ink3);font-family:var(--font-m)}
+.reset-btn{font-size:11px;padding:5px 12px;font-family:var(--font-m);background:var(--bg2);border:2px solid var(--bg3);border-radius:8px;color:var(--ink2);cursor:pointer;display:none;align-items:center;gap:4px;transition:all .15s}
+.reset-btn.visible{display:inline-flex}
+.chart-explainer{background:var(--bg2);border-radius:10px;padding:9px 12px;margin-bottom:10px;font-size:11px;color:var(--ink3);font-family:var(--font-m);line-height:1.6}
+#chart-svg-container{position:relative;width:100%;user-select:none;-webkit-user-select:none}
+#chart-svg-container svg{display:block;width:100%;touch-action:none}
+.chart-legend{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--ink3);font-family:var(--font-m);margin-top:8px;align-items:center}
+.dot{width:8px;height:8px;border-radius:2px;display:inline-block;margin-right:3px;vertical-align:middle;flex-shrink:0}
+#tip{position:absolute;pointer-events:none;display:none;background:rgba(26,18,8,.97);border:1.5px solid rgba(26,18,8,.2);border-radius:12px;padding:10px 13px;font-family:var(--font-m);font-size:12px;line-height:1.9;z-index:50;white-space:nowrap;color:#faf8f4}
+
+/* ── SCENARIO CARDS ── */
+.scen-intro{background:white;border:2px solid var(--bg3);border-radius:var(--r);padding:1.25rem 1.5rem;margin-bottom:1rem;box-shadow:var(--shadow)}
+.scen-intro-grid{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.scen-intro-row{display:flex;gap:10px;align-items:flex-start;font-size:14px;color:var(--ink);line-height:1.65}
+.scen-intro-row .si-icon{font-size:14px;flex-shrink:0;margin-top:2px}
+.scen{background:white;border:2px solid var(--bg3);border-radius:var(--r);padding:1.25rem 1.5rem;margin-bottom:1rem;transition:all .25s;animation:fadeUp .5s cubic-bezier(.22,.68,0,1.2) both;box-shadow:var(--shadow)}
+.scen.featured{border-color:rgba(26,80,160,.3)}
+.scen:nth-child(1){animation-delay:.05s}
+.scen:nth-child(2){animation-delay:.12s}
+.scen:nth-child(3){animation-delay:.19s}
+.scen-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:14px}
+.scen-name{font-family:var(--font-h);font-size:16px;font-weight:700;display:flex;align-items:center;gap:6px;margin-bottom:3px}
+.scen-tag{font-size:11px;color:var(--ink3);font-family:var(--font-m)}
+.scen-right{text-align:right;flex-shrink:0;max-width:55%}
+.scen-main{font-family:var(--font-h);font-size:30px;font-weight:800;line-height:1;letter-spacing:-.03em;word-break:break-word}
+.scen-main.small{font-size:18px;font-weight:600;letter-spacing:-.01em;padding-top:4px}
+.scen-sub{font-size:11px;color:var(--ink3);font-family:var(--font-m);margin-top:3px}
+
+
+/* ── STAT GROUPS ── */
+.tog-btn{width:100%;padding:10px 0;background:transparent;border:none;border-top:1.5px dashed var(--bg3);color:var(--ink3);font-size:12px;font-family:var(--font-m);cursor:pointer;text-align:left;margin-top:8px;display:flex;align-items:center;gap:6px;min-height:42px;transition:color .15s}
+.tog-btn:active{color:var(--ink2)}
+.tog-btn svg{transition:transform .25s cubic-bezier(.22,.68,0,1.2);flex-shrink:0}
+.tog-btn.open svg{transform:rotate(90deg)}
+.detail{display:none;margin-top:12px;animation:slideDown .2s ease}
+.detail.open{display:block}
+.stat-group{border:1.5px solid var(--bg3);border-radius:12px;overflow:hidden;margin-bottom:8px}
+.stat-group:last-child{margin-bottom:0}
+.stat-group-header{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);font-family:var(--font-m);padding:7px 12px;background:var(--bg2);border-bottom:1.5px solid var(--bg3)}
+.stat-row{display:flex;justify-content:space-between;align-items:flex-start;padding:9px 12px;border-bottom:1.5px dashed var(--bg3);gap:12px}
+.stat-row:last-child{border-bottom:none}
+.stat-row-label{font-size:12px;color:var(--ink2);font-family:var(--font-m);line-height:1.3}
+.stat-row-hint{font-size:10px;color:var(--ink3);font-family:var(--font-m);margin-top:2px;line-height:1.4}
+.stat-row-val{font-size:13px;font-family:var(--font-m);color:var(--ink);font-weight:500;text-align:right;line-height:1.3}
+.stat-row-sub{font-size:10px;color:var(--ink3);font-family:var(--font-m);margin-top:2px}
+.badge{display:inline-block;font-size:9px;padding:2px 6px;border-radius:5px;font-family:var(--font-m);background:var(--teal-bg);color:var(--teal);vertical-align:middle;margin-left:4px}
+
+/* ── GUIDE ── */
+.guide{background:white;border:2px solid var(--bg3);border-radius:var(--r);margin-bottom:1rem;box-shadow:var(--shadow)}
+.guide-hdr{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;cursor:pointer;min-height:48px;user-select:none}
+.guide-ttl{font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);font-family:var(--font-m)}
+.guide-arrow{font-size:10px;color:var(--ink3);transition:transform .25s cubic-bezier(.22,.68,0,1.2)}
+.guide-arrow.open{transform:rotate(90deg)}
+.guide-body{display:none;padding:0 18px 16px}
+.guide-body.open{display:block;animation:slideDown .25s ease}
+.guide-sep{border:none;border-top:1.5px dashed var(--bg3);margin:8px 0 12px}
+.guide-row{font-size:13px;color:var(--ink2);line-height:1.75;padding:8px 0;border-bottom:1.5px dashed var(--bg3)}
+.guide-row:last-child{border-bottom:none}
+.guide-row strong{color:var(--ink);font-weight:500}
+
+/* ── GLOSSARY PANEL ── */
+#glossaryPanel{display:none;position:fixed;inset:0;z-index:8500;background:rgba(26,18,8,.6);animation:fadeIn .2s ease}
+.glossary-box{position:absolute;bottom:0;left:50%;transform:translateX(-50%);width:min(520px,100%);max-height:75vh;background:var(--bg);border-radius:24px 24px 0 0;border-top:2px solid var(--bg3);overflow-y:auto;padding:20px 20px max(20px,env(safe-area-inset-bottom))}
+.glossary-box .gl-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.glossary-box .gl-hdr h2{font-family:var(--font-h);font-size:18px;font-weight:700}
+.glossary-box .gl-hdr button{background:var(--bg2);border:2px solid var(--bg3);border-radius:8px;color:var(--ink2);font-size:13px;font-family:var(--font-b);padding:6px 12px;cursor:pointer}
+.gl-item{padding:12px 0;border-bottom:1.5px dashed var(--bg3)}
+.gl-item:last-child{border-bottom:none}
+.gl-term{font-size:14px;font-weight:500;color:var(--ink);margin-bottom:4px;display:flex;align-items:center;gap:8px}
+.gl-badge{font-size:10px;padding:2px 7px;border-radius:5px;font-family:var(--font-m)}
+.gl-badge.btc{background:var(--btc-bg);color:var(--btc)}
+.gl-badge.fin{background:var(--blue-bg);color:var(--blue)}
+.gl-def{font-size:13px;color:var(--ink2);line-height:1.65}
+.gl-ej{margin-top:6px;font-size:11px;font-family:var(--font-m);color:var(--ink3);background:var(--bg2);border-radius:8px;padding:7px 10px;line-height:1.6;border-left:2px solid var(--gold)}
+
+/* ── FAB ── */
+.glos-fab{position:fixed;bottom:max(24px,env(safe-area-inset-bottom));right:16px;z-index:800;background:var(--bg);border:2px solid var(--bg3);border-radius:14px;padding:10px 14px;display:flex;align-items:center;gap:7px;font-size:12px;font-family:var(--font-m);color:var(--ink2);cursor:pointer;box-shadow:var(--shadow);transition:all .2s}
+.glos-fab:active{transform:scale(.95)}
+
+/* ── BOTTOM EXPLAINER ── */
+.bottom-explainer{background:var(--gold-bg);border:2px solid var(--gold-bdr);border-radius:var(--r);padding:1.5rem;margin-bottom:1.5rem}
+.bottom-explainer h3{font-family:var(--font-h);font-size:18px;font-weight:700;margin-bottom:12px}
+.bottom-steps{display:flex;flex-direction:column;gap:12px}
+.step{display:flex;gap:14px;align-items:flex-start}
+.step-num{width:28px;height:28px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:13px;font-weight:500;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.step-text{font-size:14px;line-height:1.65;color:var(--ink)}
+.step-text strong{font-weight:500}
+
+.source-note{font-size:11px;color:var(--ink3);line-height:1.8;border-top:1.5px dashed var(--bg3);padding-top:14px;margin-top:1rem}
+
+/* Audit: responsive layout, keyboard focus, readable contrast and reduced motion. */
+:root{--ink3:#6d6049;--gold:#886000;--btc:#ad4500}
+.control-label{font-size:14px;font-weight:500;display:block}
+button:focus-visible,input:focus-visible,select:focus-visible,[tabindex]:focus-visible{outline:3px solid var(--blue);outline-offset:3px}
+.guide-hdr{width:100%;border:0;background:transparent;text-align:left}
+#tutOverlay{overflow-y:auto}#tutBox{max-height:calc(100dvh - 40px);overflow:auto}
+.param-label,.param-control,.scen-top>div,.stat-row>div{min-width:0}
+.param-control{max-width:52%}#lump-hint{max-width:240px;overflow-wrap:anywhere}
+.price-bar{flex-wrap:wrap}.price-bar::before{pointer-events:none;animation:none}
+.price-mxn{flex:1 1 100%;white-space:normal}.price-dot{background:var(--ink3);animation:none}.price-bar.live .price-dot{background:var(--teal)}
+.stat-row-val,.stat-row-sub{overflow-wrap:anywhere}
+#form-error{color:var(--fiat);font-size:13px;margin-top:12px}#status,#chart-error{font-size:12px;color:var(--ink2);margin-top:10px}
+@media(max-width:520px){.page{padding:0 .75rem 5rem}.params-card,.scen,.scen-intro{padding:1rem}.param-row{flex-wrap:wrap;gap:8px}.param-label{flex-basis:100%}.param-control{max-width:100%;width:100%}.input-pill input[type=number]{flex:1;width:100%}.scen-top,.stat-row{flex-direction:column}.scen-right{max-width:100%;text-align:left}.stat-row-val{text-align:left}.chart-topbar{gap:8px;flex-wrap:wrap}.hero{padding:2rem .25rem 1.5rem}.glos-fab{bottom:10px}}
+@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important;scroll-behavior:auto!important}.anim{opacity:1}}
+
+.market-controls{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:-.5rem 0 1.5rem;font-size:12px;color:var(--ink2)}
+.market-controls button{padding:8px 10px;border:1px solid var(--bg3);border-radius:8px;background:white;color:var(--ink2);cursor:pointer}
+.market-controls button:disabled{opacity:.6;cursor:wait}
+#chart-market-status,#history-status{font-size:12px;color:var(--ink2);margin:8px 0}
+.price-bar.stale .price-dot{background:#976000}
+
+.price-status{margin-left:auto;font:500 12px var(--font-b);color:var(--ink2);white-space:nowrap}
+.price-status.current{color:var(--good)}.price-status.outdated{color:#976000}
+.market-controls{justify-content:flex-end;margin-top:-1rem}.market-controls button,.fx-auto{font:12px var(--font-b);padding:6px 10px;background:transparent;border:1px solid var(--bg3);border-radius:8px;color:var(--ink2);cursor:pointer}
+.fx-auto{margin-top:6px}.bottom-explainer p{font-size:15px;line-height:1.75}.bottom-explainer p+p{margin-top:12px}
+#history-status:empty,#status:empty{display:none}
+
+[hidden]{display:none!important}
+
+/* ── ALIGNMENT POLISH ── */
+.params-card .param-row{display:grid;grid-template-columns:minmax(0,1fr) 190px;align-items:center;column-gap:20px}
+.params-card .param-control{width:190px;max-width:none;justify-self:end}
+.params-card .input-pill{width:100%;justify-content:center}
+.params-card .input-pill input,
+.params-card .input-pill select{flex:1;width:auto;min-width:0;text-align:center!important}
+.params-card .input-pill select{text-align-last:center;padding-left:28px}
+.params-card .input-pill .prefix,
+.params-card .input-pill .suffix{min-width:42px;text-align:center;padding-left:7px;padding-right:7px}
+.params-card .input-pill .prefix{border-right:1px solid rgba(109,96,73,.12)}
+.params-card .input-pill .suffix{border-left:1px solid rgba(109,96,73,.12)}
+.params-card .fx-auto{display:block;margin:6px auto 0}
+.params-card .err-msg,#lump-hint{text-align:center;margin-left:auto;margin-right:auto}
+.stat-row>div:last-child{min-width:150px;text-align:center}
+.stat-row-val,.stat-row-sub{text-align:center}
+.scen-right{text-align:center;min-width:145px}
+
+@media(max-width:520px){
+  .params-card .param-row{grid-template-columns:1fr;row-gap:9px}
+  .params-card .param-label{text-align:center}
+  .params-card .param-control{width:min(100%,280px);max-width:280px;justify-self:center}
+  .params-card .input-pill input[type=number],
+  .params-card .input-pill input.money-input{width:auto;flex:1;text-align:center!important}
+  .scen-top{align-items:center;text-align:center}
+  .scen-right{max-width:100%;width:100%;text-align:center}
+  .stat-row{align-items:center;text-align:center}
+  .stat-row>div:last-child{width:100%;min-width:0;text-align:center}
+  .stat-row-val,.stat-row-sub{text-align:center}
+}
+</style>
+</head>
+<body><noscript><p>Esta calculadora necesita JavaScript para funcionar. Actívalo y vuelve a abrir el archivo.</p><style>#tutOverlay{display:none}.anim{opacity:1}</style></noscript>
+<!-- TUTORIAL OVERLAY -->
+<div id="tutOverlay">
+<div aria-labelledby="tutorial-title" aria-modal="true" id="tutBox" role="dialog">
+<div class="tut-header">
+<div class="tut-logo">₿</div>
+<div class="tut-title" id="tutorial-title">¿Cómo funciona esto?</div>
+<div class="tut-sub">Elige qué quieres resolver y compara tres escenarios para tu retiro.</div>
+</div>
+<div class="tut-steps">
+<div class="tut-step">
+<div class="tut-step-icon amber">💰</div>
+<div class="tut-step-text">
+<div class="ttl">Define tu meta</div>
+<div class="sub">Calcula cuándo retirarte, cuánto ahorrar o cuánto podrías gastar.</div>
+</div>
+</div>
+<div class="tut-step">
+<div class="tut-step-icon teal">📈</div>
+<div class="tut-step-text">
+<div class="ttl">Traza tu plan</div>
+<div class="sub">Parte de tus BTC actuales y del dinero que puedes aportar. Las compras se simulan al precio justo del modelo.</div>
+</div>
+</div>
+<div class="tut-step">
+<div class="tut-step-icon blue">🌍</div>
+<div class="tut-step-text">
+<div class="ttl">Compara los resultados</div>
+<div class="sub">Explora cómo cambia tu objetivo con el precio de BTC. Elige un plazo y un nivel de gasto que puedas sostener.</div>
+</div>
+</div>
+
+</div>
+<div class="tut-footer">
+<button class="tut-cta" onclick="closeTutorial()" type="button">Entendido, ¡empecemos! →</button>
+<button class="tut-skip" onclick="closeTutorial()" type="button">Ya sé cómo funciona, saltar</button>
+</div>
+</div>
+</div>
+<!-- GLOSSARY PANEL -->
+<div id="glossaryPanel" onclick="if(event.target===this)closeGlossary()">
+<div aria-labelledby="glossary-title" aria-modal="true" class="glossary-box" role="dialog">
+<div class="gl-hdr">
+<h2 id="glossary-title">Glosario Bitcoin</h2>
+<button onclick="closeGlossary()" type="button">Cerrar</button>
+</div>
+<div class="gl-item">
+<div class="gl-term">Bitcoin (BTC) <span class="gl-badge btc">BTC</span></div>
+<div class="gl-def">Moneda digital descentralizada cuya red comenzó a operar en 2009. Su protocolo establece un límite de emisión de 21 millones de BTC.</div>
+<div class="gl-ej">💡 1 Bitcoin = 100,000,000 satoshis. Puedes comprar fracciones muy pequeñas.</div>
+</div>
+<div class="gl-item">
+<div class="gl-term">DCA – Dollar Cost Averaging <span class="gl-badge fin">Finanzas</span></div>
+<div class="gl-def">Comprar BTC de forma periódica. En esta simulación, la aportación mensual aumenta con la inflación que indiques.</div>
+<div class="gl-ej">💡 A menor precio, la misma aportación compra más BTC.</div>
+</div>
+<div class="gl-item">
+<div class="gl-term">Power Law (Ley de Potencia) <span class="gl-badge btc">BTC</span></div>
+<div class="gl-def">Modelo que relaciona el precio de BTC con el tiempo. Su curva central es el «precio justo» que se usa para simular tus compras.</div>
+<div class="gl-ej">💡 Aquí se usa P(d) = 10⁻¹⁷ × d⁵·⁸, con d = días desde el 3 de enero de 2009.</div>
+</div>
+<div class="gl-item">
+<div class="gl-term">Tasa de retiro (Withdrawal Rate) <span class="gl-badge fin">Finanzas</span></div>
+<div class="gl-def">Porcentaje de tu portafolio que retirarías al año. Esta calculadora estima el primer año de retiro, no la duración de tu patrimonio.</div>
+<div class="gl-ej">💡 Portafolio de $10M MXN × 8% = $800,000/año = aproximadamente $66,667/mes antes de impuestos.</div>
+</div>
+
+<div class="gl-item">
+<div class="gl-term">Reserva fiscal hipotética <span class="gl-badge fin">México</span></div>
+<div class="gl-def">Parte del retiro bruto que decides apartar para impuestos. Se descuenta para estimar el gasto disponible.</div>
+<div class="gl-ej">💡 Con 0 %, no se descuenta ninguna reserva. El ISR real depende de tu situación fiscal.</div>
+</div>
+
+</div>
+</div>
+<!-- FAB -->
+<button class="glos-fab" id="glosFab" onclick="openGlossary()" style="display:none" type="button">
+<svg aria-hidden="true" fill="none" focusable="false" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="14"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+  Glosario
+</button>
+<div class="page" id="main-content" role="main">
+<!-- HERO -->
+<div class="hero anim a1">
+<span class="hero-emoji">₿</span>
+<h1>¿Cuándo puedo retirarme<br/>ahorrando en <span class="hl-btc">Bitcoin</span>?</h1>
+<p class="hero-lead">Tu ahorro, tus gastos y tu tiempo. Descubre cuándo podrías alcanzar tu meta de retiro con Bitcoin.</p>
+</div>
+<!-- ANALOGY -->
+
+<!-- PRICE BAR -->
+<div aria-live="polite" class="price-bar anim a2" role="status">
+
+<span class="price-label">BTC/USD</span>
+<span class="price-usd" id="livePriceDisplay">cargando…</span>
+<span class="price-status" id="livePriceMXN"></span>
+</div>
+<div class="market-controls"><button id="refresh-market" type="button">Actualizar</button></div>
+<!-- STEP 1: SOLVE MODE -->
+<div class="solve-section anim a3">
+<div class="section-label">Paso 1 — ¿Qué quieres calcular?</div>
+<div class="solve-question">Elige un modo y llena los campos que aparezcan:</div>
+<div class="solve-grid">
+<button class="solve-btn active" id="sbtn-year" onclick="setSolve('year',this)" type="button">
+<span class="sicon">📅</span>
+<span>¿Cuándo<br/>me retiro?</span>
+</button>
+<button class="solve-btn" id="sbtn-savings" onclick="setSolve('savings',this)" type="button">
+<span class="sicon">💸</span>
+<span>¿Cuánto<br/>ahorrar?</span>
+</button>
+<button class="solve-btn" id="sbtn-expenses" onclick="setSolve('expenses',this)" type="button">
+<span class="sicon">🏡</span>
+<span>¿Cuánto<br/>puedo gastar?</span>
+</button>
+</div>
+</div>
+<!-- STEP 2: PARAMS -->
+<div class="params-card anim a3">
+<p class="step-hint">Introduce tus gastos y aportaciones en pesos de hoy.</p>
+<div class="section-label" style="margin-bottom:14px">Paso 2 — Tus datos</div>
+<!-- BTC inicial -->
+<div class="param-row">
+<div class="param-label">
+<label class="control-label" for="btcHeld">Bitcoin ya comprado</label>
+<span class="sub" id="btcHeld-description">Si no tienes, deja vacío o en 0</span>
+</div>
+<div class="param-control">
+<div class="input-pill">
+<input aria-describedby="btcHeld-description" aria-label="Bitcoin ya comprado" id="btcHeld" inputmode="decimal" max="21000000" min="0" placeholder="0" step="any" type="number" value=""/>
+<span class="suffix">BTC</span>
+</div>
+</div>
+</div>
+<!-- Lump sum hoy -->
+<div class="param-row">
+<div class="param-label">
+<label class="control-label" for="lumpSum">Dinero disponible hoy (opcional)</label>
+<span class="sub" id="lumpSum-description">Compra inicial al precio justo del modelo</span>
+</div>
+<div class="param-control">
+<div class="input-pill" id="wrap-lump">
+<span class="prefix">$</span>
+<input aria-describedby="lumpSum-description" aria-label="Dinero disponible hoy (opcional)" class="wide money-input" id="lumpSum" inputmode="numeric" max="1000000000000" min="0" placeholder="0" type="text" value=""/>
+<span class="suffix">MXN</span>
+</div>
+<div class="err-msg" id="lump-hint" style="display:block;color:var(--ink3);font-family:var(--font-m)"></div>
+</div>
+</div>
+<!-- Tipo de cambio -->
+<div class="param-row">
+<div class="param-label">
+<label class="control-label" for="usdmxn">Tipo de cambio</label>
+<span class="sub" id="usdmxn-description">Automático; puedes ajustarlo para tu proyección</span>
+</div>
+<div class="param-control">
+<div class="input-pill">
+<input aria-describedby="usdmxn-description" aria-label="Tipo de cambio" id="usdmxn" inputmode="decimal" min="0.0001" step="0.01" type="number" value="20.00"/>
+<span class="suffix">MXN/USD</span>
+</div>
+<button class="fx-auto" hidden="" id="auto-market" type="button">Usar cambio automático</button></div>
+</div>
+<!-- Año meta -->
+<div class="param-row" id="field-yr">
+<div class="param-label">
+<label class="control-label" for="targetYear">Año objetivo de retiro</label>
+<span class="sub" id="targetYear-description">Se evalúa en el aniversario de hoy, en el año elegido</span>
+</div>
+<div class="param-control">
+<div class="input-pill">
+<select aria-describedby="targetYear-description" aria-label="Año objetivo de retiro" id="targetYear">
+<option disabled="" selected="" value="">—</option>
+</select>
+</div>
+</div>
+</div>
+<!-- Gastos/mes -->
+<div class="param-row" id="field-exp">
+<div class="param-label">
+<label class="control-label" for="expenses">Gasto mensual deseado</label>
+<span class="sub" id="expenses-description">¿Con cuánto quieres vivir? (pesos de hoy)</span>
+</div>
+<div class="param-control">
+<div class="input-pill" id="wrap-exp">
+<span class="prefix">$</span>
+<input aria-describedby="expenses-description" aria-label="Gasto mensual deseado" class="wide money-input" id="expenses" inputmode="numeric" max="1000000000000" min="1" placeholder="0" type="text" value=""/>
+<span class="suffix">MXN</span>
+</div>
+<div class="err-msg" id="verr-exp">Ingresa un monto mayor a $0</div>
+</div>
+</div>
+<!-- Ahorro/mes -->
+<div class="param-row" id="field-dca">
+<div class="param-label">
+<label class="control-label" for="dca">Ahorro mensual para BTC</label>
+<span class="sub" id="dca-description">Aportación mensual de hoy; aumenta con la inflación que indiques</span>
+</div>
+<div class="param-control">
+<div class="input-pill" id="wrap-dca">
+<span class="prefix">$</span>
+<input aria-describedby="dca-description" aria-label="Ahorro mensual para BTC" class="wide money-input" id="dca" inputmode="numeric" max="1000000000000" min="0" placeholder="0" type="text" value=""/>
+<span class="suffix">MXN</span>
+</div>
+<div class="err-msg" id="verr-dca">Necesitas BTC o ahorro mensual</div>
+</div>
+</div>
+<!-- Inflación -->
+<div class="param-row">
+<div class="param-label">
+<label class="control-label" for="inflation">Inflación anual esperada</label>
+<span class="sub" id="inflation-description">Ajusta tus gastos y aportaciones futuros</span>
+</div>
+<div class="param-control">
+<div class="input-pill">
+<input aria-describedby="inflation-description" aria-label="Inflación anual esperada" id="inflation" inputmode="decimal" max="30" min="0" step="any" type="number" value="4"/>
+<span class="suffix">%</span>
+</div>
+</div>
+</div>
+<!-- Retiro -->
+<div class="param-row">
+<div class="param-label">
+<label class="control-label" for="withdrawalRate">Tasa de retiro anual</label>
+<span class="sub" id="withdrawalRate-description">Porcentaje del portafolio que retirarías al año</span>
+</div>
+<div class="param-control">
+<div class="input-pill" id="wrap-wr">
+<input aria-describedby="withdrawalRate-description" aria-label="Tasa de retiro anual" id="withdrawalRate" inputmode="decimal" max="25" min="0.1" step="any" type="number" value="8"/>
+<span class="suffix">%</span>
+</div>
+<div class="err-msg" id="verr-wr">Debe ser mayor a 0%</div>
+</div>
+</div>
+<div class="step-hint" style="margin-top:16px;margin-bottom:0;background:var(--bg2);padding:10px 12px;border-radius:10px">
+<span class="sn">3</span>
+<span>Presiona <strong>Calcular</strong> para ver los 3 escenarios basados en el modelo Power Law de Bitcoin.</span>
+</div>
+<div class="param-row"><div class="param-label"><label class="control-label" for="reserveTax">Reserva fiscal hipotética</label><span class="sub" id="reserveTax-description">Porcentaje que apartas del retiro bruto; no calcula tu ISR</span></div><div class="param-control"><div class="input-pill"><input aria-describedby="reserveTax-description" aria-label="Reserva fiscal hipotética" id="reserveTax" inputmode="decimal" max="99" min="0" step="any" type="number" value="0"/><span class="suffix">%</span></div></div></div><p hidden="" id="form-error" role="alert"></p><p aria-live="polite" id="status" role="status"></p><div class="cta-wrap">
+<button class="calc-btn" onclick="calculate()" type="button">
+<svg aria-hidden="true" fill="none" focusable="false" height="16" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="16"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+      Calcular mi plan
+    </button>
+</div>
+</div>
+<!-- RESULTS -->
+<div id="results">
+<!-- CHART -->
+<div class="results-enter" id="chart-wrap">
+<div class="chart-topbar">
+<span class="chart-title">Bitcoin: precio y escenarios (USD)</span>
+<button class="reset-btn" id="resetBtn" onclick="resetZoom()" type="button">
+<svg aria-hidden="true" fill="none" focusable="false" height="12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24" width="12"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 .49-3.56"></path></svg>
+        Restablecer
+      </button>
+</div>
+<div class="chart-explainer">Línea dorada: precio de BTC. Líneas de colores: escenarios. Los puntos de cada color marcan tu fecha objetivo.</div>
+<p hidden="" id="chart-error" role="status">No se pudo cargar el gráfico. Los resultados numéricos siguen disponibles; el gráfico requiere conexión a Internet.</p><p id="history-status" role="status"></p><div id="chart-svg-container"><div id="tip"></div></div>
+<div class="chart-legend"><span><span class="dot" style="background:#805900"></span>Precio de BTC</span><span><span class="dot" style="background:#0f7a5a"></span>Precio actual</span><span><span class="dot" style="background:#1a9068"></span>Inferior</span><span><span class="dot" style="background:#1a50a0"></span>Precio justo</span><span><span class="dot" style="background:#c04030"></span>Superior</span></div>
+</div>
+<!-- HOW IT WORKS -->
+<div class="guide results-enter" style="animation-delay:.04s">
+<button aria-controls="guideBody" aria-expanded="false" class="guide-hdr" onclick="toggleGuide()" type="button">
+<span class="guide-ttl">¿Cómo funciona el modelo?</span>
+<svg aria-hidden="true" class="guide-arrow" fill="none" focusable="false" height="10" id="guideArrow" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="10"><polyline points="9 18 15 12 9 6"></polyline></svg>
+</button>
+<div class="guide-body" id="guideBody"><div class="guide-row"><strong>Precio justo</strong> es la curva central del modelo de ley de potencia. Todas las compras se simulan a ese precio; la cotización de mercado se muestra en el gráfico.</div>
+<div class="guide-row"><strong>Tres escenarios de venta:</strong> inferior (×0.49), base (×1) y superior (×6). Cambia la valoración de tus BTC, no la cantidad que compras.</div>
+<div class="guide-row"><strong>Inflación y cambio:</strong> gastos y aportaciones crecen con la inflación indicada. El tipo de cambio permanece fijo dentro de cada proyección.</div>
+<div class="guide-row"><strong>Alcance:</strong> se estima el primer año de retiro, hasta 30 años desde hoy. La simulación no evalúa cuánto durará el patrimonio después. No incluye comisiones ni calcula impuestos reales.</div></div>
+</div>
+<!-- SCENARIO INTRO -->
+
+<!-- SCENARIO: Banda inferior -->
+<div class="scen results-enter" id="scen-support" style="animation-delay:.08s">
+<div class="scen-top">
+<div>
+<div class="scen-name" style="color:#1a7a50"><svg aria-hidden="true" fill="none" focusable="false" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="14"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>Escenario inferior</div>
+<div class="scen-tag">Valoración baja</div>
+
+</div>
+<div class="scen-right">
+<div class="scen-main" id="yr-support" style="color:#1a7a50">—</div>
+<div class="scen-sub" id="mo-support">—</div>
+<div class="scen-sub" id="solve-label-support" style="margin-top:2px"></div>
+</div>
+</div>
+<button aria-controls="det-support" aria-expanded="false" class="tog-btn" id="togbtn-support" onclick="toggleDetail('support')" type="button">
+<svg aria-hidden="true" fill="none" focusable="false" height="12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="12"><polyline points="9 18 15 12 9 6"></polyline></svg>
+<span id="tl-support">Ver detalle financiero</span>
+</button>
+<div class="detail" id="det-support">
+<div class="stat-group">
+<div class="stat-group-header">Portafolio al retiro</div>
+<div class="stat-row"><div><div class="stat-row-label">Bitcoin acumulado</div><div class="stat-row-hint">BTC inicial + compras mensuales</div></div><div class="stat-row-val" id="btcacc-support">—</div></div>
+<div class="stat-row"><div><div class="stat-row-label">Valor del portafolio MXN</div><div class="stat-row-hint">BTC × precio proyectado</div></div><div><div class="stat-row-val" id="portval-support">—</div><div class="stat-row-sub" id="portbtcprice-support"></div></div></div>
+<div class="stat-row"><div><div class="stat-row-label">Crecimiento anual de BTC</div><div class="stat-row-hint">Crecimiento anualizado del modelo hasta esa fecha</div></div><div class="stat-row-val" id="cagr-support">—</div></div>
+
+</div>
+<div class="stat-group" style="margin-top:8px">
+<div class="stat-group-header">Tu aportación</div>
+<div class="stat-row"><div><div class="stat-row-label">Total de aportaciones mensuales</div></div><div class="stat-row-val" id="total-saved-support">—</div></div>
+
+</div>
+<div class="stat-group" style="margin-top:8px">
+<div class="stat-group-header">Tu retiro</div>
+<div class="stat-row"><div><div class="stat-row-label">Retiro bruto anual</div><div class="stat-row-hint">Portafolio × <span class="badge" id="wrbadge-support">—</span></div></div><div class="stat-row-val" id="withdraw-support">—</div></div>
+<div class="stat-row"><div><div class="stat-row-label">Reserva fiscal</div><div class="stat-row-hint"><span class="badge" id="isrbadge-support">—</span> del bruto</div></div><div class="stat-row-val" id="isr-support">—</div></div>
+<div class="stat-row"><div><div class="stat-row-label">Retiro neto mensual</div><div class="stat-row-hint">Después de la reserva fiscal</div></div><div><div class="stat-row-val" id="netmo-support">—</div><div class="stat-row-sub" id="netmo-equiv-support"></div></div></div>
+</div>
+</div>
+</div>
+<!-- SCENARIO: Precio justo -->
+<div class="scen featured results-enter" id="scen-fair" style="animation-delay:.12s">
+<div class="scen-top">
+<div>
+<div class="scen-name" style="color:#1a50a0"><svg aria-hidden="true" fill="none" focusable="false" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="14"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>Escenario base</div>
+<div class="scen-tag">Precio justo del modelo</div>
+
+</div>
+<div class="scen-right">
+<div class="scen-main" id="yr-fair" style="color:#1a50a0">—</div>
+<div class="scen-sub" id="mo-fair">—</div>
+<div class="scen-sub" id="solve-label-fair" style="margin-top:2px"></div>
+</div>
+</div>
+<button aria-controls="det-fair" aria-expanded="false" class="tog-btn" id="togbtn-fair" onclick="toggleDetail('fair')" type="button">
+<svg aria-hidden="true" fill="none" focusable="false" height="12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="12"><polyline points="9 18 15 12 9 6"></polyline></svg>
+<span id="tl-fair">Ver detalle financiero</span>
+</button>
+<div class="detail" id="det-fair">
+<div class="stat-group">
+<div class="stat-group-header">Portafolio al retiro</div>
+<div class="stat-row"><div><div class="stat-row-label">Bitcoin acumulado</div><div class="stat-row-hint">BTC inicial + compras mensuales</div></div><div class="stat-row-val" id="btcacc-fair">—</div></div>
+<div class="stat-row"><div><div class="stat-row-label">Valor del portafolio MXN</div><div class="stat-row-hint">BTC × precio proyectado</div></div><div><div class="stat-row-val" id="portval-fair">—</div><div class="stat-row-sub" id="portbtcprice-fair"></div></div></div>
+<div class="stat-row"><div><div class="stat-row-label">Crecimiento anual de BTC</div><div class="stat-row-hint">Crecimiento anualizado del modelo hasta esa fecha</div></div><div class="stat-row-val" id="cagr-fair">—</div></div>
+
+</div>
+<div class="stat-group" style="margin-top:8px">
+<div class="stat-group-header">Tu aportación</div>
+<div class="stat-row"><div><div class="stat-row-label">Total de aportaciones mensuales</div></div><div class="stat-row-val" id="total-saved-fair">—</div></div>
+
+</div>
+<div class="stat-group" style="margin-top:8px">
+<div class="stat-group-header">Tu retiro</div>
+<div class="stat-row"><div><div class="stat-row-label">Retiro bruto anual</div><div class="stat-row-hint">Portafolio × <span class="badge" id="wrbadge-fair">—</span></div></div><div class="stat-row-val" id="withdraw-fair">—</div></div>
+<div class="stat-row"><div><div class="stat-row-label">Reserva fiscal</div><div class="stat-row-hint"><span class="badge" id="isrbadge-fair">—</span> del bruto</div></div><div class="stat-row-val" id="isr-fair">—</div></div>
+<div class="stat-row"><div><div class="stat-row-label">Retiro neto mensual</div><div class="stat-row-hint">Después de la reserva fiscal</div></div><div><div class="stat-row-val" id="netmo-fair">—</div><div class="stat-row-sub" id="netmo-equiv-fair"></div></div></div>
+</div>
+</div>
+</div>
+<!-- SCENARIO: Banda superior -->
+<div class="scen results-enter" id="scen-resist" style="animation-delay:.16s">
+<div class="scen-top">
+<div>
+<div class="scen-name" style="color:#b03020"><svg aria-hidden="true" fill="none" focusable="false" height="14" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="14"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"></path></svg>Escenario superior</div>
+<div class="scen-tag">Valoración alta</div>
+
+</div>
+<div class="scen-right">
+<div class="scen-main" id="yr-resist" style="color:#b03020">—</div>
+<div class="scen-sub" id="mo-resist">—</div>
+<div class="scen-sub" id="solve-label-resist" style="margin-top:2px"></div>
+</div>
+</div>
+<button aria-controls="det-resist" aria-expanded="false" class="tog-btn" id="togbtn-resist" onclick="toggleDetail('resist')" type="button">
+<svg aria-hidden="true" fill="none" focusable="false" height="12" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" viewBox="0 0 24 24" width="12"><polyline points="9 18 15 12 9 6"></polyline></svg>
+<span id="tl-resist">Ver detalle financiero</span>
+</button>
+<div class="detail" id="det-resist">
+<div class="stat-group">
+<div class="stat-group-header">Portafolio al retiro</div>
+<div class="stat-row"><div><div class="stat-row-label">Bitcoin acumulado</div><div class="stat-row-hint">BTC inicial + compras mensuales</div></div><div class="stat-row-val" id="btcacc-resist">—</div></div>
+<div class="stat-row"><div><div class="stat-row-label">Valor del portafolio MXN</div><div class="stat-row-hint">BTC × precio proyectado</div></div><div><div class="stat-row-val" id="portval-resist">—</div><div class="stat-row-sub" id="portbtcprice-resist"></div></div></div>
+<div class="stat-row"><div><div class="stat-row-label">Crecimiento anual de BTC</div><div class="stat-row-hint">Crecimiento anualizado del modelo hasta esa fecha</div></div><div class="stat-row-val" id="cagr-resist">—</div></div>
+
+</div>
+<div class="stat-group" style="margin-top:8px">
+<div class="stat-group-header">Tu aportación</div>
+<div class="stat-row"><div><div class="stat-row-label">Total de aportaciones mensuales</div></div><div class="stat-row-val" id="total-saved-resist">—</div></div>
+
+</div>
+<div class="stat-group" style="margin-top:8px">
+<div class="stat-group-header">Tu retiro</div>
+<div class="stat-row"><div><div class="stat-row-label">Retiro bruto anual</div><div class="stat-row-hint">Portafolio × <span class="badge" id="wrbadge-resist">—</span></div></div><div class="stat-row-val" id="withdraw-resist">—</div></div>
+<div class="stat-row"><div><div class="stat-row-label">Reserva fiscal</div><div class="stat-row-hint"><span class="badge" id="isrbadge-resist">—</span> del bruto</div></div><div class="stat-row-val" id="isr-resist">—</div></div>
+<div class="stat-row"><div><div class="stat-row-label">Retiro neto mensual</div><div class="stat-row-hint">Después de la reserva fiscal</div></div><div><div class="stat-row-val" id="netmo-resist">—</div><div class="stat-row-sub" id="netmo-equiv-resist"></div></div></div>
+</div>
+</div>
+</div>
+<!-- BOTTOM EXPLAINER -->
+<div class="bottom-explainer results-enter" style="animation-delay:.2s"><h3>💡 Más tiempo puede significar menos BTC</h3>
+<p>Suena contraintuitivo: podrías necesitar menos BTC para vivir lo mismo dentro de más años. La razón es que, <strong>si cada BTC gana valor más rápido de lo que suben tus gastos</strong>, una cantidad menor puede cubrirlos.</p>
+<p>No se trata solo de acumular más. También de dar tiempo a lo que ya tienes. Prueba un plazo más largo y observa cómo cambia tu objetivo: <strong>¿qué equilibrio entre tiempo, ahorro y gasto tiene sentido para ti?</strong></p></div>
+<div class="source-note results-enter">Compras simuladas al precio justo; precios de mercado de <a href="https://www.coinbase.com/" rel="noopener noreferrer" target="_blank">Coinbase</a>. El resultado depende de que se cumpla el crecimiento del modelo; las caídas de BTC pueden retrasar tu meta. Una tasa de retiro más alta reduce el capital calculado, pero exige retirar más del patrimonio cada año.</div>
+</div><!-- /results -->
+</div><!-- /page -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script>
+// ── Constants ──────────────────────────────────────────────────────────────────
+const GEN=new Date('2009-01-03T00:00:00Z').getTime(),MSD=86400000;
+const PL_A=-17,PL_N=5.8;
+const MULTS={support:.49,fair:1.0,resist:6.0};
+const COL={support:'#1a9068',fair:'#1a50a0',resist:'#c04030',real:'#a08030'};
+const HALVING_YEARS=Array.from({length:Math.ceil((new Date().getUTCFullYear()+30-2012)/4)+1},(_,i)=>2012+4*i);
+let NOW=new Date();
+let START_DAY=Math.floor((Date.UTC(NOW.getUTCFullYear(),NOW.getUTCMonth(),NOW.getUTCDate())-GEN)/MSD);
+let MAX_DAY=Math.floor((Date.UTC(NOW.getUTCFullYear()+30,NOW.getUTCMonth(),NOW.getUTCDate())-GEN)/MSD);
+// Illustrative maximum supply; not live circulating supply.
+const BTC_SUPPLY=21000000;
+
+
+
+const HW=[];
+
+while(HW.length && HW[HW.length-1][0]>START_DAY)HW.pop();
+let LAST_REAL_DAY=HW.length?HW[HW.length-1][0]:START_DAY;
+let LIVE_BTC_USD=HW.length?HW[HW.length-1][1]:0;
+
+function pl(d){return Math.pow(10,PL_A+PL_N*Math.log10(Math.max(d,1)))}
+function dayToDate(d){return new Date(GEN+d*MSD)}
+function fUsdFull(v){return '$'+Math.round(v).toLocaleString('en-US')}
+function fmxn(n){return '$'+Math.round(n).toLocaleString('en-US')+' MXN'}
+function parseFormattedNumber(value){return Number(String(value??'').replace(/,/g,'').trim())}
+function formatMoneyInput(el){const raw=String(el.value??'').replace(/,/g,'').trim();if(raw===''){el.value='';return;}const n=Number(raw);if(Number.isFinite(n))el.value=Math.round(n).toLocaleString('en-US');}
+function formatFxInput(){const el=document.getElementById('usdmxn'),n=Number(el.value);if(Number.isFinite(n)&&n>0)el.value=n.toFixed(2);}
+function fusd(n){return n>=1e9?'USD '+(n/1e9).toFixed(2)+' mil M':n>=1e6?'USD '+(n/1e6).toFixed(2)+'M':'USD '+Math.round(n).toLocaleString('en-US')}
+function fUsdShort(v){if(v>=1e9)return '$'+Math.round(v/1e9)+' mil M';if(v>=1e6)return '$'+Math.round(v/1e6)+'M';if(v>=1e3)return '$'+Math.round(v/1e3)+'K';return '$'+Math.round(v)}
+function mmyyyy(d){const dt=dayToDate(d);return(dt.getUTCMonth()+1).toString().padStart(2,'0')+'/'+dt.getUTCFullYear()}
+
+let reserveRate=0;
+function fairPriceTodayUSD(){return pl(START_DAY);}
+function isr(bruto){return Math.max(0,bruto)*reserveRate;}
+
+// ── Tutorial ──────────────────────────────────────────────────────────────────
+let modalReturn=null;
+function setBackgroundInert(value){document.getElementById('main-content').inert=value;document.getElementById('glosFab').inert=value;document.body.style.overflow=value?'hidden':'';}
+function closeTutorial(){
+  document.getElementById('tutOverlay').style.display='none';document.getElementById('glosFab').style.display='flex';setBackgroundInert(false);
+  document.getElementById('sbtn-year').focus();
+  try{localStorage.setItem('btcCalcTutDone2','1');}catch(e){}
+}
+function openGlossary(){modalReturn=document.activeElement;document.getElementById('glossaryPanel').style.display='block';setBackgroundInert(true);document.querySelector('.gl-hdr button').focus();}
+function closeGlossary(){document.getElementById('glossaryPanel').style.display='none';setBackgroundInert(false);if(modalReturn)modalReturn.focus();}
+window.addEventListener('DOMContentLoaded',()=>{
+  let done=false;try{done=!!localStorage.getItem('btcCalcTutDone2');}catch(e){}
+  if(done){document.getElementById('tutOverlay').style.display='none';document.getElementById('glosFab').style.display='flex';}
+  else{setBackgroundInert(true);document.querySelector('.tut-cta').focus();}
+});
+document.addEventListener('keydown',event=>{
+  const tut=document.getElementById('tutOverlay'),gl=document.getElementById('glossaryPanel');
+  const active=tut.style.display!=='none'?tut:gl.style.display==='block'?gl:null;
+  if(!active)return;
+  if(event.key==='Escape'){event.preventDefault();active===tut?closeTutorial():closeGlossary();return;}
+  if(event.key==='Tab'){
+    const nodes=[...active.querySelectorAll('button,a[href],input,select,[tabindex="0"]')],first=nodes[0],last=nodes[nodes.length-1];
+    if(event.shiftKey&&document.activeElement===first){event.preventDefault();last.focus();}
+    else if(!event.shiftKey&&document.activeElement===last){event.preventDefault();first.focus();}
+  }
+});
+
+// ── Guide ─────────────────────────────────────────────────────────────────────
+function toggleGuide(){
+  const body=document.getElementById('guideBody'),arrow=document.getElementById('guideArrow');
+  const open=body.classList.contains('open');
+  body.classList.toggle('open',!open);arrow.classList.toggle('open',!open);document.querySelector('.guide-hdr').setAttribute('aria-expanded',String(!open));
+}
+
+// ── Solve mode ────────────────────────────────────────────────────────────────
+let _solveMode='year';
+function setSolve(mode,btn){
+  _solveMode=mode;
+  document.querySelectorAll('.solve-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  onSolveChange();
+  invalidateResults();
+}
+function getSolveMode(){return _solveMode;}
+function onSolveChange(){
+  const m=_solveMode;
+  document.querySelectorAll('.solve-btn').forEach(b=>b.setAttribute('aria-pressed',String(b.id==='sbtn-'+m)));
+  document.getElementById('field-yr').classList.toggle('field-hidden',m==='year');
+  document.getElementById('field-exp').classList.toggle('field-hidden',m==='expenses');
+  document.getElementById('field-dca').classList.toggle('field-hidden',m==='savings');
+}
+onSolveChange();
+
+// ── Detail toggle ─────────────────────────────────────────────────────────────
+function toggleDetail(sc){
+  const det=document.getElementById('det-'+sc);
+  const btn=document.getElementById('togbtn-'+sc);
+  const lbl=document.getElementById('tl-'+sc);
+  const open=det.classList.contains('open');
+  det.classList.toggle('open',!open);
+  btn.classList.toggle('open',!open);btn.setAttribute('aria-expanded',String(!open));
+  lbl.textContent=open?'Ver detalle financiero':'Ocultar detalle';
+}
+
+// ── Calc engine: all modes share the same projection ──────────────────────────
+let retirePts={},chartState=null;
+let START_Y=NOW.getUTCFullYear(), START_M=NOW.getUTCMonth();
+function dayIdxFromMonth(m){
+  const last=new Date(Date.UTC(START_Y,START_M+m+1,0)).getUTCDate();
+  return Math.floor((Date.UTC(START_Y,START_M+m,Math.min(NOW.getUTCDate(),last))-GEN)/MSD);
+}
+function targetMonths(year){return (year-START_Y)*12;}
+function snapshot(acc,totalAhorrado,m,um,il,wR,eB,sc){
+  const dayIdx=dayIdxFromMonth(m),bu=pl(dayIdx)*MULTS[sc],bm=bu*um;
+  const port=acc*bm,bruto=port*wR,isrv=isr(bruto),neto=bruto-isrv;
+  return {m,acc,dayIdx,bu,bm,port,bruto,isrv,pct:reserveRate,neto,
+    expA:eB*Math.pow(1+il,m/12)*12,totalAhorrado};
+}
+function projectAtMonth(bH,um,dB,il,wR,eB,sc,mEnd){
+  let acc=bH,total=0;
+  for(let m=1;m<=mEnd;m++){
+    const amount=dB*Math.pow(1+il,m/12);
+    acc+=amount/(pl(dayIdxFromMonth(m))*um); total+=amount;
+  }
+  return snapshot(acc,total,mEnd,um,il,wR,eB,sc);
+}
+function findRetireMonth(bH,um,dB,il,wR,eB,sc){
+  if((bH<=0&&dB<=0)||eB<=0)return null;
+  let acc=bH,total=0;
+  for(let m=0;m<=360;m++){
+    if(m){const amount=dB*Math.pow(1+il,m/12);acc+=amount/(pl(dayIdxFromMonth(m))*um);total+=amount;}
+    const r=snapshot(acc,total,m,um,il,wR,eB,sc);
+    if(r.neto>=r.expA)return r;
+  }
+  return null;
+}
+function findSavingsForYear(bH,um,eB,il,wR,sc,year){
+  const m=targetMonths(year);
+  if(m<=0||m>360||eB<=0)return null;
+  const base=projectAtMonth(bH,um,0,il,wR,eB,sc,m);
+  if(base.neto>=base.expA)return 0;
+  const unit=projectAtMonth(0,um,1,il,wR,eB,sc,m);
+  if(unit.neto<=0)return null;
+  const amount=Math.ceil((base.expA-base.neto)/unit.neto);
+  return Number.isFinite(amount)&&amount<=1e12?amount:null;
+}
+function findExpensesForYear(bH,um,dB,il,wR,sc,year){
+  const m=targetMonths(year);if(m<=0||m>360)return null;
+  const r=projectAtMonth(bH,um,dB,il,wR,0,sc,m);
+  return {...r,expMaxMes:r.neto/12/Math.pow(1+il,m/12)};
+}
+function runScenarios(bH,um,eB,dB,il,wR){
+  retirePts={};
+  const mode=getSolveMode(),year=Number(document.getElementById('targetYear').value);
+  const set=(id,value)=>{document.getElementById(id).textContent=value;};
+  for(const sc of ['support','fair','resist']){
+    for(const k of ['btcacc','portval','portbtcprice','cagr','total-saved','withdraw','isr','netmo','netmo-equiv','wrbadge','isrbadge'])set(k+'-'+sc,'—');
+    set('solve-label-'+sc,'');
+    const main=document.getElementById('yr-'+sc);main.className='scen-main';
+    let r;
+    if(mode==='year'){
+      r=findRetireMonth(bH,um,dB,il,wR,eB,sc);
+      main.textContent=r?(r.m===0?'Hoy':Math.floor(r.m/12)+' a '+r.m%12+' m'):'>30 años';
+      set('mo-'+sc,r?mmyyyy(r.dayIdx):'No se alcanza en el horizonte');
+    }else if(mode==='savings'){
+      const amount=findSavingsForYear(bH,um,eB,il,wR,sc,year);
+      main.className='scen-main small';main.textContent=amount===null?'Fuera de rango':fmxn(amount)+'/mes';
+      set('mo-'+sc,'Aportación inicial mensual');
+      if(amount!==null)r=projectAtMonth(bH,um,amount,il,wR,eB,sc,targetMonths(year));
+    }else{
+      r=findExpensesForYear(bH,um,dB,il,wR,sc,year);
+      main.className='scen-main small';main.textContent=r?fmxn(r.expMaxMes)+'/mes':'—';
+      set('mo-'+sc,'Gasto mensual en pesos de hoy');
+    }
+    if(!r)continue;
+    if(r.acc>BTC_SUPPLY){main.textContent='Fuera de escala';main.className='scen-main small';set('mo-'+sc,'El saldo proyectado supera 21 millones de BTC');continue;}
+    const {m,acc,dayIdx,bu,port,bruto,isrv,pct,neto,totalAhorrado}=r;
+    if(mode!=='year')set('solve-label-'+sc,mmyyyy(dayIdx));
+    set('btcacc-'+sc,acc.toFixed(8)+' BTC');set('portval-'+sc,fmxn(port));
+    set('portbtcprice-'+sc,'1 BTC = '+fusd(bu)+' en esa fecha');
+    set('wrbadge-'+sc,(wR*100).toFixed(1)+' %');set('withdraw-'+sc,fmxn(bruto)+'/año');
+    set('isr-'+sc,fmxn(isrv)+'/año');set('isrbadge-'+sc,(pct*100).toFixed(1)+' %');
+    set('netmo-'+sc,fmxn(neto/12)+'/mes');
+    set('netmo-equiv-'+sc,'≈ '+fmxn(neto/12/Math.pow(1+il,m/12))+' en pesos de hoy');
+    set('total-saved-'+sc,fmxn(totalAhorrado));
+    const rate=m?100*(Math.pow(bu/(fairPriceTodayUSD()*MULTS[sc]),12/m)-1):null;
+    set('cagr-'+sc,rate===null?'No aplica':rate.toFixed(1)+' %/año');
+    retirePts[sc]={dayIdx,priceUSD:bu};
+  }
+}
+
+// ── Chart ─────────────────────────────────────────────────────────────────────
+function buildChart(){
+  const error=document.getElementById('chart-error');
+  if(typeof d3==='undefined'){error.hidden=false;return;}
+  error.hidden=true;
+  const container=document.getElementById('chart-svg-container');
+  container.querySelectorAll('svg').forEach(sv=>sv.remove());
+  const totalW=container.clientWidth||640;
+  const margin={top:14,right:24,bottom:40,left:58};
+  const W=totalW-margin.left-margin.right,H=Math.max(220,Math.round(W*.52));
+
+  const xDayStart=HISTORY_START_DAY;
+  const xDayEnd=retirePts.support?Math.min(retirePts.support.dayIdx+180,MAX_DAY):retirePts.fair?Math.min(retirePts.fair.dayIdx+180,MAX_DAY):retirePts.resist?Math.min(retirePts.resist.dayIdx+180,MAX_DAY):Math.min(START_DAY+3653,MAX_DAY);
+  const hwFrom2013=HW.filter(([d])=>d>=xDayStart);
+  const yMinRaw=hwFrom2013.length?Math.min(...hwFrom2013.map(([,p])=>p)):50;
+  const yMin=Math.min(yMinRaw,market.quote?.usd||Infinity)*.65,yMax=Math.max(pl(xDayEnd)*MULTS.resist*1.45,(market.quote?.usd||0)*1.2);
+  const initView={xMin:xDayStart,xMax:xDayEnd,yMin,yMax};
+
+  const xScale=d3.scaleLog().base(10).domain([xDayStart,xDayEnd]).range([0,W]).clamp(false);
+  const yScale=d3.scaleLog().base(10).domain([yMin,yMax]).range([H,0]).clamp(false);
+  chartState={xScale,yScale,W,H,margin,container,initView,totalW};
+
+  const svg=d3.select(container).append('svg')
+    .attr('viewBox',`0 0 ${totalW} ${H+margin.top+margin.bottom}`)
+    .attr('width',totalW).attr('height',H+margin.top+margin.bottom);
+  svg.append('rect').attr('width',totalW).attr('height',H+margin.top+margin.bottom).attr('fill','#ffffff');
+  const g=svg.append('g').attr('transform',`translate(${margin.left},${margin.top})`);
+  svg.append('defs').append('clipPath').attr('id','plotclip').append('rect').attr('width',W).attr('height',H);
+  const clipG=g.append('g').attr('clip-path','url(#plotclip)');
+
+  const RESIST_ZERO_DAY=Math.max(1,Math.floor(Math.pow(10,17/PL_N)));
+  const WORLD_LX0=Math.log10(RESIST_ZERO_DAY),WORLD_LX1=Math.log10(MAX_DAY);
+  const WORLD_LY0=0,WORLD_LY1=Math.log10(pl(MAX_DAY)*MULTS.resist*2);
+  const WORLD_LW=WORLD_LX1-WORLD_LX0,WORLD_LH=WORLD_LY1-WORLD_LY0;
+  const initLX0=Math.log10(xDayStart),initLX1=Math.log10(xDayEnd);
+  const initLY0=Math.log10(yMin),initLY1=Math.log10(yMax);
+  const initLW=initLX1-initLX0,initLH=initLY1-initLY0;
+  const LY_PER_LX=initLH/initLW;
+  const CAM_LW_MIN=0.15,CAM_LW_MAX=WORLD_LW;
+  let cam={lx:(initLX0+initLX1)/2,ly:(initLY0+initLY1)/2,lw:initLW};
+
+  function camToDomains(){const lh=cam.lw*LY_PER_LX;return{lx0:cam.lx-cam.lw/2,lx1:cam.lx+cam.lw/2,ly0:cam.ly-lh/2,ly1:cam.ly+lh/2};}
+  function clampCam(){
+    cam.lw=Math.min(cam.lw,CAM_LW_MAX);
+    const lh=cam.lw*LY_PER_LX;
+    if(cam.lx-cam.lw/2<WORLD_LX0)cam.lx=WORLD_LX0+cam.lw/2;
+    if(cam.lx+cam.lw/2>WORLD_LX1)cam.lx=WORLD_LX1-cam.lw/2;
+    if(cam.ly-lh/2<WORLD_LY0)cam.ly=WORLD_LY0+lh/2;
+    if(cam.ly+lh/2>WORLD_LY1)cam.ly=WORLD_LY1-lh/2;
+    if(cam.lw>=WORLD_LW)cam.lx=(WORLD_LX0+WORLD_LX1)/2;
+    if(lh>=WORLD_LH)cam.ly=(WORLD_LY0+WORLD_LY1)/2;
+  }
+  function applyCam(){
+    clampCam();
+    const{lx0,lx1,ly0,ly1}=camToDomains();
+    chartState.xScale.domain([Math.pow(10,lx0),Math.pow(10,lx1)]);
+    chartState.yScale.domain([Math.pow(10,Math.max(0,ly0)),Math.pow(10,ly1)]);
+    redraw();
+  }
+
+  function redraw(){
+    clipG.selectAll('*').remove();g.selectAll('.ae').remove();
+    const xs=chartState.xScale,ys=chartState.yScale;
+    const[xd0,xd1]=xs.domain(),[yd0,yd1]=ys.domain();
+    const cMuted='#6d6049',cHint='#6d6049',cGrid='rgba(160,140,80,.08)';
+
+    const logY0=Math.floor(Math.log10(Math.max(yd0,1))),logY1=Math.ceil(Math.log10(yd1));
+    for(let e=logY0;e<=logY1;e++){
+      const v=Math.pow(10,e);if(v<yd0||v>yd1)continue;
+      const py=ys(v);
+      g.append('line').classed('ae',true).attr('x1',0).attr('x2',W).attr('y1',py).attr('y2',py).attr('stroke',cGrid).attr('stroke-width',.5);
+      g.append('line').classed('ae',true).attr('x1',-4).attr('x2',0).attr('y1',py).attr('y2',py).attr('stroke','rgba(160,140,80,.2)').attr('stroke-width',.5);
+      g.append('text').classed('ae',true).attr('x',-8).attr('y',py+3.5).attr('text-anchor','end').attr('font-size',9).attr('fill',cMuted).attr('font-family',"'DM Mono','Courier New',monospace").text(fUsdShort(v));
+    }
+    g.append('text').classed('ae',true).attr('transform','rotate(-90)').attr('x',-H/2).attr('y',-margin.left+13).attr('text-anchor','middle').attr('font-size',9).attr('fill',cHint).attr('font-family',"'DM Mono','Courier New',monospace").text('precio USD (log)');
+
+    Array.from({length:Math.ceil((START_Y+30-(START_Y-10))/5)+1},(_,i)=>START_Y-10+i*5).forEach(yr=>{
+      const d=Math.floor((Date.UTC(yr,0,1)-GEN)/MSD);
+      if(d<xd0||d>xd1)return;
+      const px=xs(d);
+      g.append('line').classed('ae',true).attr('x1',px).attr('x2',px).attr('y1',0).attr('y2',H).attr('stroke','rgba(200,146,10,.1)').attr('stroke-width',.5);
+      g.append('text').classed('ae',true).attr('x',px).attr('y',H+13).attr('text-anchor','middle').attr('font-size',9).attr('fill',cHint).attr('font-family',"'DM Mono','Courier New',monospace").text(yr);
+    });
+    g.append('text').classed('ae',true).attr('x',W/2).attr('y',H+28).attr('text-anchor','middle').attr('font-size',9).attr('fill',cHint).attr('font-family',"'DM Mono','Courier New',monospace").text('año');
+
+    const N=500,logD0=Math.log10(Math.max(1,xd0)),logD1=Math.log10(xd1);
+    const bDays=Array.from({length:N},(_,i)=>Math.pow(10,logD0+i*(logD1-logD0)/(N-1)));
+    const drawBand=(mult,col)=>{const pts=bDays.map(d=>({x:d,y:pl(d)*mult})).filter(p=>p.y>0);clipG.append('path').datum(pts).attr('fill','none').attr('stroke',col).attr('stroke-width',1.5).attr('stroke-dasharray','6,4').attr('opacity',.75).attr('d',d3.line().x(p=>xs(p.x)).y(p=>ys(p.y)).curve(d3.curveBasis));};
+    drawBand(MULTS.support,COL.support);drawBand(MULTS.fair,COL.fair);drawBand(MULTS.resist,COL.resist);
+
+    if(START_DAY>=xd0&&START_DAY<=xd1){const fx=xs(START_DAY);clipG.append('rect').attr('x',fx).attr('y',0).attr('width',Math.max(0,W-fx)).attr('height',H).attr('fill','rgba(160,140,80,.025)');}
+
+    const segments=[];
+    for(const point of HW){
+      if(point[0]<xd0||point[0]>xd1)continue;
+      const source='coinbase',previous=segments.at(-1);
+      const maxGap=1.1;
+      if(!previous||previous.source!==source||point[0]-previous.points.at(-1)[0]>maxGap)segments.push({source,points:[point]});
+      else previous.points.push(point);
+    }
+    for(const segment of segments){
+      const color='#805900';
+      clipG.append('path').datum(segment.points).attr('data-history-source',segment.source).attr('fill','none').attr('stroke',color).attr('stroke-width',1.2).attr('d',d3.line().x(([d])=>xs(d)).y(([,p])=>ys(p)));
+      if(segment.points.length===1)clipG.append('circle').attr('cx',xs(segment.points[0][0])).attr('cy',ys(segment.points[0][1])).attr('r',1.5).attr('fill',color);
+    }
+    if(market.quote){
+      const q=market.quote,d=(q.time-GEN)/MSD,fresh=quoteIsFresh()&&!market.lastError;
+      if(d>=xd0&&d<=xd1&&q.usd>=yd0&&q.usd<=yd1){
+        const marker=clipG.append('circle').attr('id','market-price-point').attr('data-price',q.usd).attr('data-time',new Date(q.time).toISOString()).attr('cx',xs(d)).attr('cy',ys(q.usd)).attr('r',5).attr('fill',fresh?'#0f7a5a':'#976000').attr('stroke','#fff').attr('stroke-width',2);
+        marker.append('title').text('Precio de BTC: '+fUsdFull(q.usd)+(fresh?' · actualizado':' · sin actualizar'));
+      }
+    }
+
+
+    Object.entries(retirePts).forEach(([sc,pt])=>{
+      if(!pt)return;const{dayIdx,priceUSD}=pt;
+      if(dayIdx<xd0||dayIdx>xd1||priceUSD<yd0||priceUSD>yd1)return;
+      const cx=xs(dayIdx),cy=ys(priceUSD),col=COL[sc];
+      clipG.append('line').attr('x1',cx).attr('x2',cx).attr('y1',H).attr('y2',cy+8).attr('stroke',col).attr('stroke-width',.8).attr('stroke-dasharray','3,3').attr('opacity',.35);
+      clipG.append('circle').attr('cx',cx).attr('cy',cy).attr('r',7).attr('fill',col).attr('opacity',.1);
+      clipG.append('circle').attr('cx',cx).attr('cy',cy).attr('r',3.5).attr('fill','#ffffff').attr('stroke',col).attr('stroke-width',1.4);
+      clipG.append('circle').attr('cx',cx).attr('cy',cy).attr('r',1.5).attr('fill',col);
+    });
+    g.append('rect').classed('ae',true).attr('width',W).attr('height',H).attr('fill','none').attr('stroke',cGrid).attr('stroke-width',.5);
+  }
+
+  redraw();
+  chartState.redraw=()=>{redraw();hideTip();};
+  chartState.resetCam=()=>{cam.lx=(initLX0+initLX1)/2;cam.ly=(initLY0+initLY1)/2;cam.lw=initLW;applyCam();};
+
+  svg.attr('tabindex',0).attr('role','application').attr('aria-label','Gráfico de escenarios. Usa más y menos para ampliar, flechas para desplazar y cero para restablecer. Los valores también están en las tarjetas.');
+  svg.on('keydown',event=>{
+    if(!['+','=','-','0','ArrowLeft','ArrowRight','ArrowUp','ArrowDown'].includes(event.key))return;
+    event.preventDefault();
+    if(event.key==='0'){resetZoom();return;}
+    if(['+','=','-'].includes(event.key))cam.lw=Math.max(CAM_LW_MIN,Math.min(CAM_LW_MAX,cam.lw*(event.key==='-'?1.22:.82)));
+    if(event.key==='ArrowLeft')cam.lx-=cam.lw*.1;
+    if(event.key==='ArrowRight')cam.lx+=cam.lw*.1;
+    if(event.key==='ArrowUp')cam.ly+=cam.lw*LY_PER_LX*.1;
+    if(event.key==='ArrowDown')cam.ly-=cam.lw*LY_PER_LX*.1;
+    applyCam();document.getElementById('resetBtn').classList.add('visible');
+  });
+  const tip=document.getElementById('tip');tip.style.display='none';
+  function nearestHW(dayRaw){let lo=0,hi=HW.length-1;while(lo<hi){const mid=(lo+hi)>>1;if(HW[mid][0]<dayRaw)lo=mid+1;else hi=mid;}if(lo>0&&Math.abs(HW[lo-1][0]-dayRaw)<Math.abs(HW[lo][0]-dayRaw))return HW[lo-1];return HW[lo];}
+  const crossV=g.append('line').attr('stroke','rgba(200,146,10,.4)').attr('stroke-width',1).attr('stroke-dasharray','3,3').attr('y1',0).attr('y2',H).attr('display','none');
+
+  function showTip(mx,my){
+    const xs=chartState.xScale;
+    if(mx<0||mx>W||my<0||my>H){hideTip();return;}
+    const dayRaw=xs.invert(mx);
+    let displayDay=Math.max(1,Math.round(dayRaw));
+    let realPrice=null,realLabel='';
+    if(HW.length&&dayRaw>=HW[0][0]&&dayRaw<=LAST_REAL_DAY){const[rd,rp]=nearestHW(dayRaw);if(Math.abs(rd-dayRaw)<=(remoteCloses.has(rd)?1:3.5)){displayDay=rd;realPrice=rp;realLabel='Precio de BTC';}}
+    if(market.quote&&Math.abs(xs((market.quote.time-GEN)/MSD)-mx)<8){displayDay=(market.quote.time-GEN)/MSD;realPrice=market.quote.usd;realLabel=quoteIsFresh()?'BTC · actualizado':'BTC · sin actualizar';}
+    const cx=xs(displayDay);crossV.attr('x1',cx).attr('x2',cx).attr('display',null);
+    const dt=dayToDate(displayDay);
+    const dateStr=dt.toLocaleDateString('es-MX',{day:'numeric',month:'short',year:'numeric',timeZone:'UTC'});
+    const plS=pl(displayDay)*MULTS.support,plF=pl(displayDay)*MULTS.fair,plR=pl(displayDay)*MULTS.resist;
+    const isFuture=displayDay>(Date.now()-GEN)/MSD;
+    const entries=[{label:'Banda superior',val:plR,col:'#ffaaa0'},{label:'Precio justo',val:plF,col:'#a8c8ff'},{label:'Banda inferior',val:plS,col:'#88ddba'}];
+    if(realPrice!==null)entries.push({label:realLabel,val:realPrice,col:'#f0d080'});
+    entries.sort((a,b)=>b.val-a.val);
+    const rows=entries.map(e=>`<div style="color:${e.col}">${e.label} &nbsp;${fUsdShort(e.val)}</div>`).join('');
+    tip.innerHTML=`<div style="color:#9a8a6a;margin-bottom:4px;padding-bottom:3px;border-bottom:.5px solid rgba(160,140,80,.2);font-size:10px">${dateStr}${isFuture?' · proyección':realPrice===null?' · sin precio observado':''}</div>${rows}`;
+    tip.style.display='block';
+    const tipW=tip.offsetWidth||160,tipH=tip.offsetHeight||96;
+    const svgOffX=margin.left+cx,contW=container.clientWidth;
+    const contH=container.clientHeight||H+margin.top+margin.bottom;
+    let lx=svgOffX+14;if(lx+tipW>contW-2)lx=svgOffX-tipW-14;lx=Math.max(2,lx);
+    let ty=margin.top+my-tipH/2;if(ty<2)ty=2;if(ty+tipH>contH-2)ty=contH-tipH-2;
+    tip.style.left=lx+'px';tip.style.top=ty+'px';
+  }
+  function hideTip(){tip.style.display='none';crossV.attr('display','none');}
+
+  svg.on('wheel',event=>{
+    if(!event.ctrlKey&&!event.metaKey)return;
+    event.preventDefault();
+    const[mx]=d3.pointer(event,g.node());
+    if(!event.ctrlKey&&!event.metaKey)return;
+    const factor=event.deltaY<0?.82:1.22;
+    const newLw=Math.max(CAM_LW_MIN,Math.min(CAM_LW_MAX,cam.lw*factor));
+    if(newLw===cam.lw)return;
+    const cursorFrac=mx/W,{lx0}=camToDomains();
+    const lxUC=lx0+cursorFrac*cam.lw;
+    cam.lw=newLw;cam.lx=lxUC-cursorFrac*cam.lw+cam.lw/2;
+    applyCam();document.getElementById('resetBtn').classList.add('visible');
+  },{passive:false});
+
+  let dragPrev=null;
+  svg.on('mousedown',event=>{if(event.button!==0)return;svg.node().focus();const[mx,my]=d3.pointer(event,g.node());dragPrev={x:mx,y:my};});
+  d3.select(window).on('mousemove.cp',event=>{
+    if(!dragPrev)return;
+    const[mx,my]=d3.pointer(event,g.node());
+    const dx=mx-dragPrev.x,dy=my-dragPrev.y;dragPrev={x:mx,y:my};
+    const lh=cam.lw*LY_PER_LX;
+    cam.lx-=(dx/W)*cam.lw;cam.ly+=(dy/H)*lh;
+    applyCam();document.getElementById('resetBtn').classList.add('visible');
+  });
+  d3.select(window).on('mouseup.cp',()=>{dragPrev=null;});
+
+  let lastPinchDist=null,lastPinchMidFrac=null;
+  let touchPrev=null,isPinching=false,pinchTimer=null;
+
+  svg.on('touchstart',event=>{
+    dragPrev=null;
+    const touches=event.touches;
+    if(touches.length===2){
+      isPinching=true;clearTimeout(pinchTimer);
+      const t1=touches[0],t2=touches[1];
+      lastPinchDist=Math.hypot(t2.clientX-t1.clientX,t2.clientY-t1.clientY);
+      const rect=svg.node().getBoundingClientRect();
+      const midX=((t1.clientX+t2.clientX)/2-rect.left-margin.left)/W;
+      lastPinchMidFrac=Math.max(0,Math.min(1,midX));
+      touchPrev=null;hideTip();
+    }else if(touches.length===1&&!isPinching){
+      const[mx,my]=d3.pointer(touches[0],g.node());touchPrev={x:mx,y:my};showTip(mx,my);
+    }
+  },{passive:true});
+
+  svg.on('touchmove',event=>{
+    event.preventDefault();
+    const touches=event.touches;
+    if(touches.length===2){
+      isPinching=true;touchPrev=null;hideTip();
+      const t1=touches[0],t2=touches[1];
+      const dist=Math.hypot(t2.clientX-t1.clientX,t2.clientY-t1.clientY);
+      if(lastPinchDist&&dist>0){
+        const factor=lastPinchDist/dist;
+        const newLw=Math.max(CAM_LW_MIN,Math.min(CAM_LW_MAX,cam.lw*factor));
+        if(newLw!==cam.lw){
+          const pf=lastPinchMidFrac??0.5,{lx0}=camToDomains();
+          const lxUP=lx0+pf*cam.lw;cam.lw=newLw;cam.lx=lxUP-pf*cam.lw+cam.lw/2;
+          applyCam();document.getElementById('resetBtn').classList.add('visible');
+        }
+      }
+      lastPinchDist=dist;
+    }else if(touches.length===1){
+      if(isPinching){touchPrev=null;return;}
+      const[mx,my]=d3.pointer(touches[0],g.node());
+      if(touchPrev){
+        const dx=mx-touchPrev.x,dy=my-touchPrev.y;
+        const lh=cam.lw*LY_PER_LX;
+        cam.lx-=(dx/W)*cam.lw;cam.ly+=(dy/H)*lh;
+        applyCam();document.getElementById('resetBtn').classList.add('visible');hideTip();
+      }else{showTip(mx,my);}
+      touchPrev={x:mx,y:my};
+    }
+  },{passive:false});
+
+  svg.on('touchend touchcancel',event=>{
+    if(event.touches.length===0){lastPinchDist=null;pinchTimer=setTimeout(()=>{isPinching=false;},350);touchPrev=null;hideTip();}
+    else if(event.touches.length===1&&isPinching){touchPrev=null;lastPinchDist=null;}
+  });
+
+  g.append('rect').attr('width',W).attr('height',H).attr('fill','transparent')
+    .on('mousemove',event=>{const[mx,my]=d3.pointer(event,g.node());showTip(mx,my);})
+    .on('mouseleave',hideTip);
+}
+
+function resetZoom(){
+  if(!chartState)return;
+  if(chartState.resetCam)chartState.resetCam();
+  document.getElementById('resetBtn').classList.remove('visible');
+}
+
+// ── Validation, live quote and initialization ────────────────────────────────
+function updateLumpHint(){
+  const lump=parseFormattedNumber(document.getElementById('lumpSum').value),fx=Number(document.getElementById('usdmxn').value),price=fairPriceTodayUSD();
+  document.getElementById('lump-hint').textContent=lump>0&&fx>0&&price>0?'≈ '+(lump/fx/price).toFixed(8)+' BTC al precio justo del modelo':'';
+}
+function invalidateResults(){
+  document.getElementById('results').style.display='none';
+  document.getElementById('status').textContent='Pulsa Calcular para actualizar tu plan.';
+}
+function calculate(options={}){
+  synchronizeCalendar();
+  const mode=getSolveMode(),errors=[];
+  document.querySelectorAll('[aria-invalid="true"]').forEach(e=>e.removeAttribute('aria-invalid'));
+  document.querySelectorAll('.input-pill.err').forEach(e=>e.classList.remove('err'));
+  document.querySelectorAll('.err-msg.show').forEach(e=>e.classList.remove('show'));
+  function read(id,min,max,optional=false){
+    const el=document.getElementById(id),empty=el.value.trim()==='';
+    const v=empty&&optional?0:(el.classList.contains('money-input')?parseFormattedNumber(el.value):Number(el.value));
+    if((el.type==='number'&&el.validity.badInput)||(!optional&&empty)||!Number.isFinite(v)||v<min||v>max){
+      el.setAttribute('aria-invalid','true');el.closest('.input-pill').classList.add('err');
+      errors.push({el,message:el.getAttribute('aria-label')+': introduce un número entre '+min+' y '+max+'.'});
+    }
+    return v;
+  }
+  const held=read('btcHeld',0,21000000,true),lump=read('lumpSum',0,1e12,true);
+  const fx=read('usdmxn',.0001,1e6),price=fairPriceTodayUSD();
+  const inflation=read('inflation',0,30)/100,wr=read('withdrawalRate',.1,25)/100;
+  const tax=read('reserveTax',0,99)/100;
+  const expense=mode==='expenses'?0:read('expenses',.01,1e12);
+  const dca=mode==='savings'?0:read('dca',0,1e12,true);
+  if(mode!=='year'){
+    const el=document.getElementById('targetYear'),y=Number(el.value);
+    if(!Number.isInteger(y)||y<=START_Y||y>START_Y+30){el.setAttribute('aria-invalid','true');el.closest('.input-pill').classList.add('err');errors.push({el,message:'Selecciona un año objetivo.'});}
+  }
+  if(!dirty.has('usdmxn')&&!fxIsFresh())errors.push({el:document.getElementById('usdmxn'),message:'El tipo de cambio automático no está actualizado. Espera la conexión o introduce un valor manual.'});
+  const btc=held+lump/fx/price;
+  if(btc>21000000)errors.push({el:document.getElementById('btcHeld'),message:'El saldo inicial total supera 21 millones de BTC.'});
+  if(mode!=='savings'&&btc<=0&&dca<=0)errors.push({el:document.getElementById('dca'),message:'Introduce BTC, dinero disponible o una aportación mensual mayor que cero.'});
+  const err=document.getElementById('form-error');
+  if(errors.length){err.textContent=errors.map(e=>e.message).join(' ');err.hidden=false;document.getElementById('results').style.display='none';errors[0].el.focus();return false;}
+  err.hidden=true;reserveRate=tax;
+  runScenarios(btc,fx,expense,dca,inflation,wr);
+  document.getElementById('results').style.display='block';
+  document.getElementById('status').textContent='Resultados actualizados';
+  if(options.automatic)redrawMarketChart();
+  else{document.getElementById('resetBtn').classList.remove('visible');requestAnimationFrame(buildChart);}
+  updateLumpHint();return true;
+}
+const yearSelect=document.getElementById('targetYear');
+for(let y=START_Y+1;y<=START_Y+30;y++){const opt=document.createElement('option');opt.value=y;opt.textContent=y;yearSelect.append(opt);}
+const dirty=new Set();
+document.querySelectorAll('.params-card input,.params-card select').forEach(el=>{
+  el.addEventListener('input',()=>{dirty.add(el.id);invalidateResults();updateLumpHint();showMarketStatus();});
+  el.addEventListener('change',()=>{dirty.add(el.id);invalidateResults();updateLumpHint();showMarketStatus();});
+  el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();calculate();}});
+});
+document.querySelectorAll('.money-input').forEach(el=>{
+  el.addEventListener('input',()=>{
+    const pos=el.selectionStart, before=el.value, digitsBefore=(before.slice(0,pos).match(/\d/g)||[]).length;
+    const clean=before.replace(/[^0-9]/g,'');
+    el.value=clean?Number(clean).toLocaleString('en-US'):'';
+    let seen=0,newPos=el.value.length;
+    for(let i=0;i<el.value.length;i++){if(/\d/.test(el.value[i]))seen++;if(seen>=digitsBefore){newPos=i+1;break;}}
+    try{el.setSelectionRange(newPos,newPos)}catch(e){}
+  });
+  el.addEventListener('blur',()=>formatMoneyInput(el));
+});
+document.getElementById('usdmxn').addEventListener('blur',formatFxInput);
+
+// Market data and model prices are kept separate.
+const REFRESH_MS=60000,STALE_MS=5*60000,HISTORY_RETRY_MS=15*60000;
+const HISTORY_KEY='btcCalcDailyClosesV2',QUOTE_KEY='btcCalcMarketV1';
+
+const HISTORY_START_DAY=Math.max(1,START_DAY-3653);
+const remoteCloses=new Map();
+const market={quote:null,fx:null,busy:false,historyBusy:false,historyDay:null,historyRetryAt:0,lastError:'',fxError:'',timer:null};
+const quoteStatus=document.getElementById('livePriceMXN');
+document.getElementById('usdmxn').value='';
+function quoteIsFresh(){return !!market.quote&&Date.now()-market.quote.time<=STALE_MS&&Date.now()-market.quote.receivedAt<=STALE_MS&&market.quote.time<=Date.now()+60000;}
+function fxIsFresh(){return !!market.fx&&Date.now()-market.fx.receivedAt<=STALE_MS;}
+function redrawMarketChart(){
+  if(document.getElementById('results').style.display!=='block')return;
+  if(chartState?.redraw)chartState.redraw();else requestAnimationFrame(buildChart);
+}
+function showMarketStatus(){
+  const fresh=quoteIsFresh()&&!market.lastError,q=market.quote,bar=document.querySelector('.price-bar');
+  bar.classList.toggle('live',fresh);bar.classList.toggle('stale',!fresh);
+  document.getElementById('livePriceDisplay').textContent=q?fUsdFull(q.usd):'—';
+  quoteStatus.textContent=fresh?'✓ Actualizado':q?'Sin actualizar':market.busy?'Actualizando…':'Sin conexión';
+  quoteStatus.className='price-status '+(fresh?'current':'outdated');
+  document.getElementById('auto-market').hidden=!dirty.has('usdmxn');
+  document.querySelector('.market-controls').hidden=fresh;
+}
+function synchronizeCalendar(){
+  const now=new Date(),day=Math.floor((Date.UTC(now.getUTCFullYear(),now.getUTCMonth(),now.getUTCDate())-GEN)/MSD);
+  if(day===START_DAY)return false;
+  NOW=now;START_DAY=day;START_Y=now.getUTCFullYear();START_M=now.getUTCMonth();
+  MAX_DAY=dayIdxFromMonth(360);
+  HALVING_YEARS.splice(0,HALVING_YEARS.length,...Array.from({length:Math.ceil((START_Y+30-2012)/4)+1},(_,i)=>2012+4*i));
+  const previous=yearSelect.value;
+  yearSelect.innerHTML='<option value="" disabled>Selecciona un año</option>';
+  for(let y=START_Y+1;y<=START_Y+30;y++){const o=document.createElement('option');o.value=y;o.textContent=y;yearSelect.append(o);}
+  yearSelect.value=Number(previous)>START_Y&&Number(previous)<=START_Y+30?previous:'';
+  chartState=null;market.historyDay=null;return true;
+}
+async function requestJSON(url){
+  const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),10000);
+  try{
+    const response=await fetch(url,{signal:controller.signal,cache:'no-store',credentials:'omit'});
+    if(!response.ok)throw new Error('HTTP '+response.status);
+    return await response.json();
+  }finally{clearTimeout(timer);}
+}
+function saveMarket(){try{localStorage.setItem(QUOTE_KEY,JSON.stringify({quote:market.quote,fx:market.fx}));}catch(e){}}
+function loadMarket(){
+  try{
+    const cached=JSON.parse(localStorage.getItem(QUOTE_KEY)||'null');
+    const q=cached?.quote,f=cached?.fx;
+    if(q&&Number.isFinite(q.usd)&&q.usd>0&&Number.isFinite(q.time)&&q.time>GEN&&q.time<=Date.now()+60000&&Number.isFinite(q.receivedAt)&&q.receivedAt<=Date.now()+60000)market.quote=q;
+    if(f&&Number.isFinite(f.value)&&f.value>0&&Number.isFinite(f.receivedAt)&&f.receivedAt<=Date.now()+60000)market.fx=f;
+  }catch(e){}
+}
+function applyAutomaticFields(){
+  let changed=false;
+  if(market.fx&&!dirty.has('usdmxn')){const value=market.fx.value.toFixed(2),el=document.getElementById('usdmxn');if(el.value!==value){el.value=value;changed=true;}}
+  updateLumpHint();return changed;
+}
+function mergeHistory(){
+  const points=new Map();
+  for(const [day,close] of remoteCloses)if(day<START_DAY)points.set(day,close);
+  HW.splice(0,HW.length,...[...points].sort((a,b)=>a[0]-b[0]));
+  LAST_REAL_DAY=HW.at(-1)?.[0]||START_DAY;
+}
+function loadHistory(){
+  try{
+    const cached=JSON.parse(localStorage.getItem(HISTORY_KEY)||'null');
+    if(Array.isArray(cached?.points))for(const p of cached.points){if(Array.isArray(p)&&Number.isInteger(p[0])&&p[0]>=HISTORY_START_DAY&&p[0]<START_DAY&&Number.isFinite(p[1])&&p[1]>0)remoteCloses.set(p[0],p[1]);}
+  }catch(e){}
+  mergeHistory();
+}
+function saveHistory(){try{localStorage.setItem(HISTORY_KEY,JSON.stringify({points:[...remoteCloses]}));}catch(e){}}
+async function refreshHistory(force=false){
+  if(market.historyBusy||(!force&&(market.historyDay===START_DAY||Date.now()<market.historyRetryAt)))return;
+  market.historyBusy=true;
+  const status=document.getElementById('history-status');
+  const today=START_DAY;
+  let cursor=remoteCloses.size?Math.max(HISTORY_START_DAY,Math.max(...remoteCloses.keys())-2):HISTORY_START_DAY;
+  try{
+    status.textContent='Cargando histórico de BTC…';
+    while(cursor<today){
+      const end=Math.min(today,cursor+299);
+      const query=new URLSearchParams({granularity:'86400',start:dayToDate(cursor).toISOString(),end:dayToDate(end).toISOString()});
+      const rows=await requestJSON('https://api.exchange.coinbase.com/products/BTC-USD/candles?'+query);
+      if(!Array.isArray(rows))throw new Error('Histórico no válido');
+      let accepted=0;
+      for(const row of rows){
+        if(!Array.isArray(row)||row.length<5)continue;
+        const time=Number(row[0])*1000,close=Number(row[4]),day=Math.floor((time-GEN)/MSD);
+        if(Number.isFinite(time)&&time%MSD===0&&day>=cursor&&day<end&&day<today&&Number.isFinite(close)&&close>0){remoteCloses.set(day,close);accepted++;}
+      }
+      if(!accepted)throw new Error('Sin cierres para el intervalo');
+      mergeHistory();saveHistory();redrawMarketChart();
+      cursor=end;
+      // At most two historical requests per second; ticker polling is independent.
+      if(cursor<today)await new Promise(resolve=>setTimeout(resolve,500));
+    }
+    const last=Math.max(...remoteCloses.keys());
+    if(last<today-1)throw new Error('No está disponible el cierre de ayer');
+    market.historyDay=today;market.historyRetryAt=0;
+    status.textContent='';
+  }catch(e){
+    market.historyRetryAt=Date.now()+HISTORY_RETRY_MS;
+    const last=remoteCloses.size?Math.max(...remoteCloses.keys()):null;
+    status.textContent='No se pudo completar el histórico. Se reintentará automáticamente.';
+  }finally{market.historyBusy=false;}
+}
+async function refreshMarketData(){
+  if(market.busy)return;
+  market.busy=true;document.getElementById('refresh-market').disabled=true;showMarketStatus();
+  const calendarChanged=synchronizeCalendar();
+  const wasVisible=document.getElementById('results').style.display==='block';
+  try{
+    // Independent services: a failure in FX does not discard a fresh BTC quote.
+    const [ticker,fx]=await Promise.allSettled([
+      requestJSON('https://api.exchange.coinbase.com/products/BTC-USD/ticker'),
+      requestJSON('https://api.coinbase.com/v2/exchange-rates?currency=USD')
+    ]);
+    market.lastError='';market.fxError='';
+    if(ticker.status==='fulfilled'){
+      const usd=Number(ticker.value.price),time=Date.parse(ticker.value.time);
+      if(Number.isFinite(usd)&&usd>0&&Number.isFinite(time)&&time<=Date.now()+60000&&Date.now()-time<=STALE_MS&&(!market.quote||time>=market.quote.time)){
+        market.quote={usd,time,receivedAt:Date.now()};LIVE_BTC_USD=usd;
+      }else market.lastError='Cotización no válida o antigua';
+    }else market.lastError='No se pudo consultar la cotización';
+    if(fx.status==='fulfilled'){
+      const value=Number(fx.value?.data?.rates?.MXN);
+      if(Number.isFinite(value)&&value>0)market.fx={value,receivedAt:Date.now()};
+      else market.fxError='Cambio no válido';
+    }else market.fxError='No se pudo consultar el cambio';
+    saveMarket();
+    const changed=applyAutomaticFields();showMarketStatus();
+    if(wasVisible&&(changed||calendarChanged)&&fxIsFresh())calculate({automatic:true});
+    else redrawMarketChart();
+  }finally{
+    market.busy=false;document.getElementById('refresh-market').disabled=false;showMarketStatus();
+    void refreshHistory();
+  }
+}
+function startRefreshCycle(){
+  clearTimeout(market.timer);
+  if(document.hidden)return;
+  market.timer=setTimeout(()=>{showMarketStatus();redrawMarketChart();void refreshMarketData();startRefreshCycle();},REFRESH_MS);
+}
+document.getElementById('refresh-market').addEventListener('click',()=>{void refreshMarketData();void refreshHistory(true);});
+document.getElementById('auto-market').addEventListener('click',()=>{
+  dirty.delete('usdmxn');
+  applyAutomaticFields();showMarketStatus();
+  if(document.getElementById('results').style.display==='block')calculate({automatic:true});
+  void refreshMarketData();
+});
+document.addEventListener('visibilitychange',()=>{
+  clearTimeout(market.timer);showMarketStatus();redrawMarketChart();
+  if(!document.hidden){void refreshMarketData();void refreshHistory(true);startRefreshCycle();}
+});
+window.addEventListener('online',()=>{void refreshMarketData();void refreshHistory(true);startRefreshCycle();});
+window.addEventListener('offline',()=>{market.lastError='Sin conexión';showMarketStatus();redrawMarketChart();});
+window.addEventListener('pageshow',event=>{if(event.persisted){void refreshMarketData();startRefreshCycle();}});
+loadMarket();loadHistory();applyAutomaticFields();showMarketStatus();
+void refreshMarketData();startRefreshCycle();
+onSolveChange();updateLumpHint();
+let resizeTimer;
+window.addEventListener('resize',()=>{clearTimeout(resizeTimer);resizeTimer=setTimeout(()=>{if(document.getElementById('results').style.display==='block'){buildChart();document.getElementById('resetBtn').classList.remove('visible');}},150);});
+</script>
+</body>
+</html>
